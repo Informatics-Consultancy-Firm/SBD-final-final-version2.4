@@ -1,4 +1,4 @@
-// ============================================================    
+// ============================================================
 //  ICF-SL  ai_agent.js
 //  • Analysis dashboard — fetches from ICF-SL Server via GAS
 //  • AI Agent modal (GAS-backed Claude chat)
@@ -476,7 +476,7 @@
 
         // Aggregate
         let tp=0,ti=0,tb=0,tg=0,tbi=0,tgi=0,tr=0,trem=0;
-        const byDist={},bySubmitter={};
+        const byDist={};
         const cls={b:[0,0,0,0,0],g:[0,0,0,0,0],bi:[0,0,0,0,0],gi:[0,0,0,0,0]};
 
         all.forEach(r=>{
@@ -487,9 +487,8 @@
             const d=r.district||'Unknown';
             if(!byDist[d])byDist[d]={n:0,p:0,i:0,b:0,g:0,bi:0,gi:0};
             byDist[d].n++;byDist[d].p+=vp;byDist[d].i+=vi;byDist[d].b+=vb;byDist[d].g+=vg;byDist[d].bi+=vbi;byDist[d].gi+=vgi;
-            const sub=r.submitted_by||'Unknown';
-            if(!bySubmitter[sub])bySubmitter[sub]={n:0,p:0,i:0};
-            bySubmitter[sub].n++;bySubmitter[sub].p+=vp;bySubmitter[sub].i+=vi;
+
+
             for(let c=1;c<=5;c++){
                 cls.b[c-1]+=+r['c'+c+'_boys']||0;cls.g[c-1]+=+r['c'+c+'_girls']||0;
                 cls.bi[c-1]+=+r['c'+c+'_boys_itn']||0;cls.gi[c-1]+=+r['c'+c+'_girls_itn']||0;
@@ -563,14 +562,7 @@
           </div>
         </div>`:''}
 
-        <!-- Row 4: By submitter -->
-        ${Object.keys(bySubmitter).length>1?`
-        <div class="an-section">
-          <div class="an-section-hdr"><svg viewBox="0 0 24 24" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>BY DISTRIBUTOR</div>
-          <div class="an-section-body">
-            <div class="an-chart-card"><div class="an-chart-label">Schools Submitted per Distributor</div><canvas id="anSubmitterBar"></canvas></div>
-          </div>
-        </div>`:''}
+        <!-- BY DISTRIBUTOR section removed -->
 
         <!-- School table -->
         <div class="an-section">
@@ -638,12 +630,7 @@
             mkChart('anDistGender',{type:'bar',data:{labels:distL,datasets:[{label:'Boys',data:distBoysCov,backgroundColor:'rgba(0,64,128,.75)',borderColor:'#004080',borderWidth:2,borderRadius:4},{label:'Girls',data:distGirlsCov,backgroundColor:'rgba(233,30,140,.7)',borderColor:'#e91e8c',borderWidth:2,borderRadius:4}]},options:{...chartOpts({indexAxis:'y',scales:{x:{beginAtZero:true,max:100,ticks:{callback:v=>v+'%',font:CF.font},grid:{color:'rgba(0,0,0,.05)'}},y:{ticks:{font:CF.font},grid:{display:false}}}})}});
         }
 
-        // 9. By submitter bar
-        if(Object.keys(bySubmitter).length>1){
-            const subs=Object.entries(bySubmitter).sort((a,b)=>b[1].n-a[1].n).slice(0,10);
-            const subLabels=subs.map(s=>s[0]),subVals=subs.map(s=>s[1].n),subCov=subs.map(s=>s[1].p>0?Math.round((s[1].i/s[1].p)*100):0);
-            mkChart('anSubmitterBar',{type:'bar',data:{labels:subLabels,datasets:[{label:'Schools',data:subVals,backgroundColor:'rgba(0,64,128,.7)',borderColor:'#004080',borderWidth:2,borderRadius:5,yAxisID:'y'},{label:'Coverage %',data:subCov,backgroundColor:'rgba(40,167,69,.6)',borderColor:'#28a745',borderWidth:2,borderRadius:5,type:'line',yAxisID:'y1'}]},options:{...chartOpts({scales:{y:{beginAtZero:true,ticks:{font:CF.font},grid:{color:'rgba(0,0,0,.05)'},title:{display:true,text:'Schools',font:CF.font}},y1:{beginAtZero:true,max:100,position:'right',ticks:{callback:v=>v+'%',font:CF.font},grid:{display:false},title:{display:true,text:'Coverage',font:CF.font}},x:{ticks:{font:CF.font},grid:{display:false}}}})}});
-        }
+        // By distributor chart removed
     };
 
     // ════════════════════════════════════════════════════════
