@@ -1468,7 +1468,12 @@ window.loadSchoolIntoForm = function(key) {
 // NAVIGATION
 // ============================================
 window.nextSection = function() {
-    if (state.currentSection === 1) { moveToNextSection(); return; }
+    if (state.currentSection === 1) {
+        moveToNextSection();
+        // Show entry method modal when arriving at Section B
+        setTimeout(() => { window.ensureSectionBVisible && window.ensureSectionBVisible(); }, 150);
+        return;
+    }
     if (validateCurrentSection()) moveToNextSection();
 };
 
@@ -1479,6 +1484,10 @@ window.previousSection = function() {
         document.querySelector('.form-section[data-section="'+state.currentSection+'"]')?.classList.add('active');
         updateProgress();
         window.scrollTo({ top: 0, behavior: 'smooth' });
+        // Restore Section B content when going back
+        if (state.currentSection === 2) {
+            setTimeout(() => { window.ensureSectionBVisible && window.ensureSectionBVisible(); }, 150);
+        }
     }
 };
 
