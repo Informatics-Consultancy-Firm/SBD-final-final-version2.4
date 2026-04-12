@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#004080">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <style>
 :root{
@@ -1057,8 +1057,6 @@ function showReceipt(r, synced) {
   // Generate QR code with full dispatch info
   const qrContainer = document.getElementById('receiptQR');
   qrContainer.innerHTML = '';
-  const canvas = document.createElement('canvas');
-  qrContainer.appendChild(canvas);
 
   const qrData = JSON.stringify({
     type:         'ICF-SL-ITN-MOVEMENT',
@@ -1070,17 +1068,22 @@ function showReceipt(r, synced) {
     itn_type:     'Dual-AI',
     total:        r.total_qty,
     driver:       r.driver_name,
-    driver_user:  r.driver_username,
     vehicle:      r.vehicle,
     staff:        r.staff_name,
     verify_code:  r.dispatch_id.slice(-6).toUpperCase()
   });
 
-  if (typeof QRCode !== 'undefined' && QRCode.toCanvas) {
-    QRCode.toCanvas(canvas, qrData, {
-      width: 200, margin: 2,
-      color: { dark:'#004080', light:'#ffffff' }
-    }, err => { if (err) { console.error('QR error', err); qrContainer.innerHTML='<div style="padding:20px;color:var(--red);">QR Error</div>'; } });
+  if (typeof QRCode !== 'undefined') {
+    try {
+      new QRCode(qrContainer, {
+        text:         qrData,
+        width:        200,
+        height:       200,
+        colorDark:    '#004080',
+        colorLight:   '#ffffff',
+        correctLevel: QRCode.CorrectLevel.M
+      });
+    } catch(e) { console.error('QR error:', e); }
   }
 
   // Show receipt, hide steps
@@ -1270,17 +1273,27 @@ function renderDriverQR() {
   document.getElementById('driverCardDistrict').textContent= u.district;
   document.getElementById('driverCardVehicle').textContent = u.vehicle ? 'Vehicle: '+u.vehicle : '';
   document.getElementById('driverCardUsername').textContent= u.username;
-  const container=document.getElementById('driverQrCard');
-  container.innerHTML='';
-  const canvas=document.createElement('canvas');
-  container.appendChild(canvas);
-  if (typeof QRCode!=='undefined'&&QRCode.toCanvas) {
-    QRCode.toCanvas(canvas, u.username, {
-      width:170, margin:2,
-      color:{dark:'#004080',light:'#ffffff'}
-    }, err => { if(err) console.error(err); });
+  var container = document.getElementById('driverQrCard');
+  container.innerHTML = '';
+  // Full SBD ID format so DMS app can parse Name, Role, District, Tel
+  var qrText = 'Name: ' + (u.full_name||'') + '\nID: ' + (u.username||'') +
+               '\nRole: ' + (u.role||'') + '\nDistrict: ' + (u.district||'') +
+               '\nTel: ' + (u.phone||'');
+  if (typeof QRCode !== 'undefined') {
+    try {
+      new QRCode(container, {
+        text:         qrText,
+        width:        170,
+        height:       170,
+        colorDark:    '#004080',
+        colorLight:   '#ffffff',
+        correctLevel: QRCode.CorrectLevel.M
+      });
+    } catch(e) {
+      container.textContent = u.username;
+    }
   } else {
-    container.innerHTML='<div style="font-size:20px;font-weight:700;color:var(--navy);padding:16px;letter-spacing:3px;">'+u.username+'</div>';
+    container.textContent = u.username;
   }
 }
 
