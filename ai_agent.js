@@ -1360,10 +1360,10 @@
                                 <div style="font-family:Oswald,sans-serif;font-size:20px;font-weight:700;color:#ffc107;">${dPct}%</div>
                                 <div style="height:4px;width:60px;background:rgba(255,255,255,.2);border-radius:3px;margin-top:3px;"><div style="height:100%;width:${dPct}%;background:#ffc107;border-radius:3px;"></div></div>
                             </div>
-                            <span id="${duid}_arr" style="color:#ffc107;font-size:14px;">▼</span>
+                            <span id="${duid}_arr" style="color:#ffc107;font-size:14px;">▶</span>
                         </div>
                     </div>
-                    <div id="${duid}" style="padding:12px;">`;
+                    <div id="${duid}" style="display:none;padding:12px;">`;
 
                 Object.keys(csvTree[district]).sort().forEach(chiefdom => {
                     const phus = csvTree[district][chiefdom];
